@@ -1,3 +1,4 @@
+# Modified by smalvy, 2026 — adapted for portfolio-project-1
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
@@ -25,6 +26,16 @@ Resources:
           Properties:
             Path: /hello
             Method: get
+      Tags:
+        Project: portfolio-project-1
+  ItemsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
+      Tags:
+        Project: portfolio-project-1
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
