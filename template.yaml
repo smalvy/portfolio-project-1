@@ -31,6 +31,9 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref ItemsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItemsTable
   ItemsTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
