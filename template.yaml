@@ -28,6 +28,9 @@ Resources:
             Method: get
       Tags:
         Project: portfolio-project-1
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ItemsTable
   ItemsTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
