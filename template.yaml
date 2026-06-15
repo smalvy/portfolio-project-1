@@ -9,13 +9,13 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 30
 
 Resources:
   ItemsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: hello_world/
+      CodeUri: items/
       Handler: app.lambda_handler
       Runtime: python3.14
       Architectures:
@@ -36,6 +36,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref ItemsTable
+          DYNAMODB_ENDPOINT: ""
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItemsTable
