@@ -6,6 +6,11 @@ Description: >
 
   Sample SAM Template for portfolio-project-1
 
+Parameters:
+  AlertEmail:
+    Type: String
+    Description: E-mail address to receive CloudWatch alerts
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
@@ -48,6 +53,36 @@ Resources:
         Type: String
       Tags:
         Project: portfolio-project-1
+  AlertsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Tags:
+        - Key: Project
+          Value: portfolio-project-1
+  AlertsSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Protocol: email
+      Endpoint: !Ref AlertEmail
+      TopicArn: !Ref AlertsTopic
+  AlertsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: ErrorItemsFunctionAlarm
+      AlarmDescription: Alarm raised when the number of errors in the ItemsFunction invocations exceeds the threshold during a period of time
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref ItemsFunction
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      AlarmActions:
+        - !GetAtt AlertsTopic.TopicArn
+
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
