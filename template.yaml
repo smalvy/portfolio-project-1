@@ -36,7 +36,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref ItemsTable
-          DYNAMODB_ENDPOINT: ""
+          DYNAMODB_ENDPOINT: "" # Set it to "http://host.docker.internal:4566" to deploy on LocalStack
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItemsTable
