@@ -1,72 +1,62 @@
+# Modified by smalvy, 2026 — adapted for portfolio-project-1
 import json
 
-import pytest
+from unittest.mock import patch, MagicMock
 
-from hello_world import app
+from items import app
 
 
-@pytest.fixture()
-def apigw_event():
-    """ Generates API GW Event"""
+def test_post_items():
+    mock_table = MagicMock()
+    mock_table.put_item.return_value = {}
 
-    return {
-        "body": '{ "test": "body"}',
-        "resource": "/{proxy+}",
-        "requestContext": {
-            "resourceId": "123456",
-            "apiId": "1234567890",
-            "resourcePath": "/{proxy+}",
-            "httpMethod": "POST",
-            "requestId": "c6af9ac6-7b61-11e6-9a41-93e8deadbeef",
-            "accountId": "123456789012",
-            "identity": {
-                "apiKey": "",
-                "userArn": "",
-                "cognitoAuthenticationType": "",
-                "caller": "",
-                "userAgent": "Custom User Agent String",
-                "user": "",
-                "cognitoIdentityPoolId": "",
-                "cognitoIdentityId": "",
-                "cognitoAuthenticationProvider": "",
-                "sourceIp": "127.0.0.1",
-                "accountId": "",
-            },
-            "stage": "prod",
-        },
-        "queryStringParameters": {"foo": "bar"},
-        "headers": {
-            "Via": "1.1 08f323deadbeefa7af34d5feb414ce27.cloudfront.net (CloudFront)",
-            "Accept-Language": "en-US,en;q=0.8",
-            "CloudFront-Is-Desktop-Viewer": "true",
-            "CloudFront-Is-SmartTV-Viewer": "false",
-            "CloudFront-Is-Mobile-Viewer": "false",
-            "X-Forwarded-For": "127.0.0.1, 127.0.0.2",
-            "CloudFront-Viewer-Country": "US",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            "Upgrade-Insecure-Requests": "1",
-            "X-Forwarded-Port": "443",
-            "Host": "1234567890.execute-api.us-east-1.amazonaws.com",
-            "X-Forwarded-Proto": "https",
-            "X-Amz-Cf-Id": "aaaaaaaaaae3VYQb9jd-nvCd-de396Uhbp027Y2JvkCPNLmGJHqlaA==",
-            "CloudFront-Is-Tablet-Viewer": "false",
-            "Cache-Control": "max-age=0",
-            "User-Agent": "Custom User Agent String",
-            "CloudFront-Forwarded-Proto": "https",
-            "Accept-Encoding": "gzip, deflate, sdch",
-        },
-        "pathParameters": {"proxy": "/examplepath"},
-        "httpMethod": "POST",
-        "stageVariables": {"baz": "qux"},
-        "path": "/examplepath",
+    with patch("items.app.get_table", return_value = mock_table):
+        event = {
+            "body": "{\"name\": \"test item\", \"description\": \"test\"}",
+            "httpMethod": "POST"
+        }
+        response = app.lambda_handler(event, {})
+        assert response["statusCode"] == 201
+
+
+def test_get_items():
+    mock_table = MagicMock()
+    mock_table.scan.return_value = {
+        "Items": [
+            {"id": "123", "name": "test item", "description": "test 1"},
+            {"id": "456", "name": "test item 2", "description": "test 2"},
+            {"id": "789", "name": "test item 3", "description": "test 3"},
+        ]
     }
 
+    with patch("items.app.get_table", return_value = mock_table):
+        event = {
+            "httpMethod": "GET"
+        }
+        response = app.lambda_handler(event, {})
+        assert response["statusCode"] == 200
 
-def test_lambda_handler(apigw_event):
 
-    ret = app.lambda_handler(apigw_event, "")
-    data = json.loads(ret["body"])
+def test_post_item_missing_body():
+    mock_table = MagicMock()
+    mock_table.put_item.return_value = {}
 
-    assert ret["statusCode"] == 200
-    assert "message" in ret["body"]
-    assert data["message"] == "hello world"
+    with patch("items.app.get_table", return_value = mock_table):
+        event = {
+            "body": None,
+            "httpMethod": "POST"
+        }
+        response = app.lambda_handler(event, {})
+        assert response["statusCode"] == 400
+
+
+def test_method_not_allowed():
+    mock_table = MagicMock()
+    mock_table.put_item.return_value = {}
+
+    with patch("items.app.get_table", return_value = mock_table):
+        event = {
+            "httpMethod": ""
+        }
+        response = app.lambda_handler(event, {})
+        assert response["statusCode"] == 405
