@@ -11,7 +11,7 @@ def get_table():
     global dynamodb, table
     
     if table is None:
-        dynamodb = boto3.resource("dynamodb", endpoint_url = os.environ.get("DYNAMODB_ENDPOINT"))
+        dynamodb = boto3.resource("dynamodb", endpoint_url = os.environ.get("DYNAMODB_ENDPOINT") or None)
         table = dynamodb.Table(os.environ["TABLE_NAME"])
     
     return table
