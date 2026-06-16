@@ -40,3 +40,5 @@ s3_bucket = "awssamcli-managed-default"
 s3_prefix = "portfolio-project-1"
 region = "us-east-1"
 stack_name = "portfolio-project-1"
+# parameter to use for LocalStack deployment in local
+# parameter_overrides = "AlertEmail=#INSERT NOTIFICATION E-MAIL ADDRESS#"
