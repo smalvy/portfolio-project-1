@@ -51,7 +51,7 @@ def lambda_handler(event, context):
                 table.put_item(Item = item)
                 
                 statusCode = 201
-                bodyMessage = item
+                bodyMessage = json.dumps(item)
         
         else:
             statusCode = 405
