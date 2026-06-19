@@ -17,6 +17,14 @@ Globals:
     Timeout: 30
 
 Resources:
+  ItemsApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        ResourcePolicy:
+          IpRangeWhitelist:
+            - "#IP IN CIDR NOTATION (xxx.xxx.xxx.xxx/xx) TO LIMIT THE ACCESS ON API GATEWAY#"
   ItemsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -31,11 +39,13 @@ Resources:
           Properties:
             Path: /items
             Method: get
+            RestApiId: !Ref ItemsApi
         PostItems:
           Type: Api
           Properties:
             Path: /items
             Method: post
+            RestApiId: !Ref ItemsApi
       Tags:
         Project: portfolio-project-1
       Environment:
@@ -85,12 +95,9 @@ Resources:
 
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  ItemsApi:
+  ItemsApiEndpoint:
     Description: "API Gateway endpoint URL for Prod stage for Items function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/items/"
+    Value: !Sub "https://${ItemsApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/items/"
   ItemsFunction:
     Description: "Items Lambda Function ARN"
     Value: !GetAtt ItemsFunction.Arn
