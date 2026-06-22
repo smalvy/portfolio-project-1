@@ -24,7 +24,7 @@ Resources:
       Auth:
         ResourcePolicy:
           IpRangeWhitelist:
-            - "#IP IN CIDR NOTATION (xxx.xxx.xxx.xxx/xx) TO LIMIT THE ACCESS ON API GATEWAY#"
+            - "127.0.0.1/8" # "#IP IN CIDR NOTATION (xxx.xxx.xxx.xxx/xx) TO LIMIT THE ACCESS ON API GATEWAY#"
   ItemsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
