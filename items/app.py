@@ -25,6 +25,7 @@ def lambda_handler(event, context):
     httpMethod = event["httpMethod"]
     statusCode = 0
     bodyMessage = ""
+    throwsException = False
     
     try:
         if(httpMethod == "GET"):
@@ -42,16 +43,23 @@ def lambda_handler(event, context):
             else:
                 table = get_table()
                 deserializeEventBody = json.loads(event["body"])
-                id = uuid.uuid4()
-                item = {}
 
-                item["id"] = id.hex
-                item = item | deserializeEventBody
-
-                table.put_item(Item = item)
+                # Intentional error trigger for demonstrating CloudWatch Alarm + SNS alerting.
+                # # POST a body with "name": "TRIGGER_ERROR" to simulate an unhandled exception.
+                if deserializeEventBody.get("name") == "TRIGGER_ERROR":
+                    throwsException = True
                 
-                statusCode = 201
-                bodyMessage = json.dumps(item)
+                else:
+                    id = uuid.uuid4()
+                    item = {}
+
+                    item["id"] = id.hex
+                    item = item | deserializeEventBody
+
+                    table.put_item(Item = item)
+                    
+                    statusCode = 201
+                    bodyMessage = json.dumps(item)
         
         else:
             statusCode = 405
@@ -60,6 +68,9 @@ def lambda_handler(event, context):
     except Exception as e:
         statusCode = 500
         bodyMessage = json.dumps({"error": str(e)})
+    
+    if throwsException:
+        raise Exception("Test: errore simulato da input utente")
     
     return {
             "statusCode": statusCode,
