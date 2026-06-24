@@ -248,5 +248,7 @@ $RECYCLE.BIN/
 
 # Other staff
 *.drawio*
+utility_scripts
+NOTES.md
 
 # End of https://www.gitignore.io/api/osx,linux,python,windows,pycharm,visualstudiocode
